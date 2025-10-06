@@ -8,25 +8,40 @@
 * Creates an empty sequence (numElts == 0) or a sequence of numElts items
 * indexed from 0 ... (numElts - 1).
 */
-Sequence::Sequence(size_t sz = 0)
+Sequence::Sequence(size_t sz)
 {
   this->sz = sz;
+  if (sz == 0) {
+    data = nullptr;
+  } else {
+    data = new std::string[sz];
+  }
 }
 
 // creates a (deep) copy of sequence s
 Sequence::Sequence(const Sequence& s) {
+  sz = s.sz;
+  if (sz == 0) {
+    data = nullptr;
+  } else {
+    data = new std::string[sz];
+    for (size_t i = 0; i < sz; i++) {
+      data[i] = s.data[i];
+    }
+  }
 }
 
 // Destroys all items in the sequence and release the memory
 // associated with the sequence
 Sequence::~Sequence() {
+  delete[] data;
+  data = new std::string[sz];
 
 }
 
 // The current sequence is released and replaced by a (deep) copy of sequence
 // s. A reference to the copied sequence is returned (return *this;).
 Sequence& Sequence::operator=(const Sequence& s) {
-
 }
 
 // The position satisfies ( position >= 0 && position <= last_index() ).

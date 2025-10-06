@@ -35,7 +35,8 @@ public:
 
 private:
     size_t sz;
-    std::vector<std::string> data; // or use raw pointers if required by your assignment
+    // std::vector<std::string> data; // or use raw pointers if required by your assignment
+    std::string* data;
 };
 
 #endif
