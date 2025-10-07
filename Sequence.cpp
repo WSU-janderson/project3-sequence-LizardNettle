@@ -35,14 +35,24 @@ Sequence::Sequence(const Sequence& s) {
 // associated with the sequence
 Sequence::~Sequence() {
   delete[] data;
-  data = new std::string[sz];
-
-
+  data = nullptr
 }
 
 // The current sequence is released and replaced by a (deep) copy of sequence
 // s. A reference to the copied sequence is returned (return *this;).
 Sequence& Sequence::operator=(const Sequence& s) {
+  if (this != &s) { // prevent self assignment
+    delete[] data;  // clean up old memory.
+    sz = s.sz;
+    if (sz == 0) {
+      data = nullptr;
+    } else {
+      data = new std::string[sz];
+      for (size_t i = 0; i < sz; i++) {
+        data[i] = s.data[i];
+      }
+    }
+  }
 }
 
 // The position satisfies ( position >= 0 && position <= last_index() ).
