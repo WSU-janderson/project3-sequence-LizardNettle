@@ -4,6 +4,8 @@
 #include "Sequence.h"
 #include <string>
 
+using namespace std;
+
 /**
 * Creates an empty sequence (numElts == 0) or a sequence of numElts items
 * indexed from 0 ... (numElts - 1).
@@ -35,7 +37,7 @@ Sequence::Sequence(const Sequence& s) {
 // associated with the sequence
 Sequence::~Sequence() {
   delete[] data;
-  data = nullptr
+  data = nullptr;
 }
 
 // The current sequence is released and replaced by a (deep) copy of sequence
@@ -78,28 +80,30 @@ void Sequence::pop_back() {
 // value of item is inserted at position and the size of sequence is increased
 // by one. Throws an exceptionif the position is outside the bounds of the
 // sequence
-void Sequence::insert(size_t position, std::string item)
+void Sequence::insert(size_t position, std::string item) {}
 
 // Returns the first element in the sequence. If the sequence is empty, throw an
 // exception.
 std::string Sequence::front() const {
-
+  // TODO: error handling
+  return data[0];
 }
 
 // Return the last element in the sequence. If the sequence is empty, throw an
 // exception.
 std::string Sequence::back() const {
-
+  // TODO: error handling
+  return data[sz - 1];
 }
 
 // Return true if the sequence has no elements, otherwise false.
 bool Sequence::empty() const {
-
+  return sz == 0;
 }
 
 // Return the number of elements in the sequence.
 size_t Sequence::size() const {
-
+  return sz;
 }
 
 // All items in the sequence are deleted and the memory associated with the
@@ -125,4 +129,4 @@ void Sequence::erase(size_t position, size_t count) {
 // Outputs all elements (ex: <4, 8, 15, 16, 23, 42>) as a string to the output
 // stream. This is *not* a method of the Sequence class, but instead it is a
 // friend function
-friend ostream& operator<<(ostream& os, const Sequence& s)
+// friend ostream& operator<<(ostream& os, const Sequence& s) {}
