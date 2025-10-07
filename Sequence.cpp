@@ -37,6 +37,7 @@ Sequence::~Sequence() {
   delete[] data;
   data = new std::string[sz];
 
+
 }
 
 // The current sequence is released and replaced by a (deep) copy of sequence
