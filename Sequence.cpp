@@ -33,8 +33,10 @@ Sequence::Sequence(const Sequence& s) {
   }
 }
 
-// Destroys all items in the sequence and release the memory
-// associated with the sequence
+/**
+ * Destroys all items in the sequence and release
+ * the memory associated with the sequence
+ */
 Sequence::~Sequence() {
   delete[] data;
   data = nullptr;
@@ -42,6 +44,13 @@ Sequence::~Sequence() {
 
 // The current sequence is released and replaced by a (deep) copy of sequence
 // s. A reference to the copied sequence is returned (return *this;).
+/**
+ * The current sequence is released and replaced by a (deep) copy of sequence
+ * s. A reference to the copied sequence is returned.
+ *
+ * @param s The sequence being copied
+ * @return a reference to the copied sequence (
+ */
 Sequence& Sequence::operator=(const Sequence& s) {
   if (this != &s) { // prevent self assignment
     delete[] data;  // clean up old memory.
@@ -55,31 +64,78 @@ Sequence& Sequence::operator=(const Sequence& s) {
       }
     }
   }
+  return *this;
 }
 
-// The position satisfies ( position >= 0 && position <= last_index() ).
-// The return value is a reference to the item at index position in the
-// sequence. Throws an exception if the position is outside the bounds
-// of the sequence
+/**
+ * The position satisfies ( position >= 0 && position <= last_index() ).
+ * The return value is a reference to the item at index position in the
+ * sequence. Throws an exception if the position is outside the bounds
+ * of the sequence.
+ *
+ * @param position the position of the data being returned.
+ * @return a reference to the item at index position in the sequence.
+ */
 std::string& Sequence::operator[](size_t position) {
-
+  // if position is outside the bounds of the sequence, throw out_of_range error.
+  if (position >= sz) {
+    throw out_of_range("Index out of range in Sequence::operator[]");
+  }
+  return data[position];
 }
 
-// The value of item is append to the sequence.
+/**
+ * The value of item is appended to the sequence.
+ * @param item the string being appended to the sequence
+ */
 void Sequence::push_back(std::string item) {
-
+  std::string* newData = new std::string[sz + 1];
+  for (size_t i = 0; i < sz; i++) {
+    newData[i] = data[i];
+  }
+  newData[sz] = item;
+  delete[] data;
+  data = newData;
+  sz += 1;
 }
 
-// The item at the end of the sequence is deleted and size of the sequence is
-// reduced by one. If sequence was empty, throws an exception
+
+/**
+ * The item at the end of the sequence is deleted and size of the sequence is reudced by one.
+ * If the sequence was empty, throws an exception.
+ */
 void Sequence::pop_back() {
+  // if sequence sz is 0, throw underflow_error
+  if (sz == 0) {
+    throw underflow_error("Can't pop_back from empty sequence");
+  }
 
+  // reduce sz, then create a nullptr to store new data
+  sz = sz - 1;
+  std::string* newData = nullptr;
+
+  // if sz > 0 then copy all data to newData, except for the last value
+  if (sz > 0) {
+    newData = new std::string[sz];
+    for (size_t i = 0; i < sz; i++) {
+      newData[i] = data[i];
+    }
+  }
+  // delete data and replace it with newData
+  delete[] data;
+  data = newData;
 }
 
-// The position satisfies ( position >= 0 && position <= last_index() ). The
-// value of item is inserted at position and the size of sequence is increased
-// by one. Throws an exceptionif the position is outside the bounds of the
-// sequence
+
+/**
+ * The position satisfies ( position >= 0 && position <= last_index() ). The
+ * value of item is inserted at position and the size of sequence is increased
+ * by one. Throws an exception if the position is outside the bounds of the
+ * sequence
+ *
+ * @param position the position the item is being inserted into.
+ * @param item The item being inserted into the sequence
+ */
 void Sequence::insert(size_t position, std::string item) {}
 
 /**
@@ -108,6 +164,7 @@ std::string Sequence::back() const {
   } catch (const std::out_of_range& e) {
     std::cout << "Sequence is empty" << endl;
   }
+  return data[sz - 1];
 }
 
 // Return true if the sequence has no elements, otherwise false.
@@ -163,4 +220,3 @@ std::ostream& operator<<(std::ostream& os, const Sequence& s) {
   }
   return os;
 }
-// friend ostream& operator<<(ostream& os, const Sequence& s) {}
