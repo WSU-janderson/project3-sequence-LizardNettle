@@ -82,18 +82,32 @@ void Sequence::pop_back() {
 // sequence
 void Sequence::insert(size_t position, std::string item) {}
 
-// Returns the first element in the sequence. If the sequence is empty, throw an
-// exception.
+/**
+ * Return the first element in the sequence.
+ * If the sequence is empty, prints "Sequence is emtpy" to the console.
+ * @return returns the element at the front of the sequence. Returns "" if sequence is empty.
+ */
 std::string Sequence::front() const {
-  // TODO: error handling
-  return data[0];
+  //try to return data[0] (the front) + catch the out_of_range error if sequence is emtpy
+  try {
+    return data[0];
+  } catch (const std::out_of_range& e) {
+      std::cout << "Sequence is empty" << endl;
+      return "";
+  }
 }
 
-// Return the last element in the sequence. If the sequence is empty, throw an
-// exception.
+/**
+ * Return the last element in the sequence.
+ * If the sequence is empty, prints "Sequence is emtpy" to the console.
+ * @return returns the element at the back of the sequence or "" if the sequence is empty.
+ */
 std::string Sequence::back() const {
-  // TODO: error handling
-  return data[sz - 1];
+  try {
+    return data[sz - 1];
+  } catch (const std::out_of_range& e) {
+    std::cout << "Sequence is empty" << endl;
+  }
 }
 
 // Return true if the sequence has no elements, otherwise false.
@@ -127,6 +141,26 @@ void Sequence::erase(size_t position, size_t count) {
 }
 
 // Outputs all elements (ex: <4, 8, 15, 16, 23, 42>) as a string to the output
-// stream. This is *not* a method of the Sequence class, but instead it is a
-// friend function
+// stream. This is not a method of the Sequence class.
+
+/**
+* Outputs all elements (ex: <4, 8, 15, 16, 23, 42>) as a string to the output
+* stream. This is not a method of the Sequence class.
+* @param os
+* @param s The sequence being printed
+* @return returns os
+*/
+std::ostream& operator<<(std::ostream& os, const Sequence& s) {
+  os << "<";
+
+  // loop through all values, printing them to the console.
+  for (size_t i = 0; i < s.sz; i++) {
+    os << s.data[i];
+    if (i != s.sz - 1) {  //print comma if not on last element
+      os << ", ";
+    }
+    os << ">";
+  }
+  return os;
+}
 // friend ostream& operator<<(ostream& os, const Sequence& s) {}
