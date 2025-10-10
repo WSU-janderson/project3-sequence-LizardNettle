@@ -186,19 +186,62 @@ void Sequence::clear() {
 
 // The item at position is removed from the sequence, and the memory
 // is released. If called with an invalid position throws an exception.
-void Sequence::erase(size_t position) {
 
+/**
+ * The item at position is removed from the sequence, and the memory
+ * is released. If called with an invalid position throws an exception.
+ * @param position the position of the value being erased
+ */
+void Sequence::erase(size_t position) {
+  // throw error if position is out of range
+  if (position >= sz) {
+    throw out_of_range("Index out of range in Sequence::erase");
+  }
+  std::string* newData = nullptr; // var will replace data
+
+  // for all items in sequence, if item is not at position, add it to newData
+  if (sz > 1) {
+    newData = new std::string[sz - 1];
+    for (size_t i = 0, j = 0; i < sz; i++) {
+      newData[j++] = data[i];
+    }
+  }
+  // replace data with newData
+  delete[] data;
+  data = newData;
 }
+
 
 // The items in the sequence at ( position ... (position + count - 1) ) are
 // deleted and their memory released. If called with invalid position and/or
 // count throws an exception.
+/**
+ * The items in the sequence at ( position ... (position + count - 1) ) are
+ * deleted and their memory released. If called with invalid position and/or
+ * count throws an exception.
+ *
+ * @param position the position of the value being erased
+ * @param count the number of items being erased.
+ */
 void Sequence::erase(size_t position, size_t count) {
+  // throw error if position is out of range, or if position + count is out of range
+  if (position >= sz || position + count > sz) {
+    throw out_of_range("Index out of range in Sequence::erase");
+  }
+  auto* newData = new std::string[sz - count];
 
+  // for all values in sequence, if value is not within the range of
+  // ( position ... (position + count - 1), add it to newData
+  for (size_t i = 0, j = 0; i < sz; i++) {
+    if (i < position || i >= position + count) {
+      newData[j++] = data[i];
+    }
+  }
+  // replace data with newData
+  delete[] data;
+  data = newData;
+  sz -= count;
 }
-
-// Outputs all elements (ex: <4, 8, 15, 16, 23, 42>) as a string to the output
-// stream. This is not a method of the Sequence class.
 
 /**
 * Outputs all elements (ex: <4, 8, 15, 16, 23, 42>) as a string to the output

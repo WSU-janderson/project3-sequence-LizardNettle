@@ -34,7 +34,7 @@ public:
     friend std::ostream& operator<<(std::ostream& os, const Sequence& s);
 
 private:
-    size_t sz;
+    size_t sz; // size of the sequence
     // std::vector<std::string> data; // or use raw pointers if required by your assignment
     std::string* data;
 };
