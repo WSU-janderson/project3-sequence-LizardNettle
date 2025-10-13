@@ -146,7 +146,7 @@ void Sequence::insert(size_t position, std::string item) {
 
   // create variable to replace data, then add all values to newData
   std::string* newData = new std::string[sz + 1];
-  for (size_t i = 0, j = 0; i < sz; i++) {
+  for (size_t i = 0, j = 0; i < sz + 1; i++) {
     if (i == position) {
       newData[i] = item;
     } else {
