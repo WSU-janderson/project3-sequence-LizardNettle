@@ -286,7 +286,7 @@ std::ostream& operator<<(std::ostream& os, const Sequence& s) {
     if (i != s.sz - 1) {  //print comma if not on last element
       os << ", ";
     }
-    os << ">";
   }
+  os << ">";
   return os;
 }
