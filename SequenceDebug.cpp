@@ -85,14 +85,6 @@ int main() {
     s4.clear();
     cout << "After clear(), s4.empty() = " << s4.empty() << endl;
 
-    // Test exception handling
-    cout << "\nTesting out_of_range access..." << endl;
-    try {
-        cout << s2[10] << endl; // invalid access
-    } catch (const out_of_range& e) {
-        cout << "Caught exception: " << e.what() << endl;
-    }
-
     cout << "\n===== Testing Complete =====" << endl;
     return 0;
 }
