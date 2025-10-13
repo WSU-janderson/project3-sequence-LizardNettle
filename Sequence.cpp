@@ -240,6 +240,7 @@ void Sequence::erase(size_t position) {
   // replace data with newData
   delete[] data;
   data = newData;
+  sz -= 1;
 }
 
 /**
@@ -255,19 +256,23 @@ void Sequence::erase(size_t position, size_t count) {
   if (position >= sz || position + count > sz) {
     throw out_of_range("Index out of range in Sequence::erase");
   }
-  auto* newData = new std::string[sz - count];
+  std::string* newData = nullptr;
+  size_t newSize = sz - count;
 
   // for all values in sequence, if value is not within the range of
   // ( position ... (position + count - 1), add it to newData
-  for (size_t i = 0, j = 0; i < sz; i++) {
-    if (i < position || i >= position + count) {
-      newData[j++] = data[i];
+  if (newSize > 0) {
+    newData = new std::string[newSize];
+    for (size_t i = 0, j = 0; i < sz; i++) {
+      if (i < position || i >= position + count) {
+        newData[j++] = data[i];
+      }
     }
   }
   // replace data with newData
   delete[] data;
   data = newData;
-  sz -= count;
+  sz = newSize;
 }
 
 /**
