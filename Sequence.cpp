@@ -42,8 +42,6 @@ Sequence::~Sequence() {
   data = nullptr;
 }
 
-// The current sequence is released and replaced by a (deep) copy of sequence
-// s. A reference to the copied sequence is returned (return *this;).
 /**
  * The current sequence is released and replaced by a (deep) copy of sequence
  * s. A reference to the copied sequence is returned.
@@ -53,11 +51,13 @@ Sequence::~Sequence() {
  */
 Sequence& Sequence::operator=(const Sequence& s) {
   if (this != &s) { // prevent self assignment
-    delete[] data;  // clean up old memory.
+    // delete values in data, change sz to match s.sz
+    delete[] data;
     sz = s.sz;
-    if (sz == 0) {
+
+    if (sz == 0) { // check if s is empty
       data = nullptr;
-    } else {
+    } else { // copy values in s to the sequence
       data = new std::string[sz];
       for (size_t i = 0; i < sz; i++) {
         data[i] = s.data[i];
@@ -89,10 +89,12 @@ std::string& Sequence::operator[](size_t position) {
  * @param item the string being appended to the sequence
  */
 void Sequence::push_back(std::string item) {
+  // create variable to replace data, then add all values to newData
   std::string* newData = new std::string[sz + 1];
   for (size_t i = 0; i < sz; i++) {
     newData[i] = data[i];
   }
+  // add item to newData, then replace data with newData
   newData[sz] = item;
   delete[] data;
   data = newData;
@@ -136,7 +138,26 @@ void Sequence::pop_back() {
  * @param position the position the item is being inserted into.
  * @param item The item being inserted into the sequence
  */
-void Sequence::insert(size_t position, std::string item) {}
+void Sequence::insert(size_t position, std::string item) {
+  // throw error if position is not in the Sequence
+  if (position > sz) {
+    throw out_of_range("Index out of range in Sequence::insert");
+  }
+
+  // create variable to replace data, then add all values to newData
+  std::string* newData = new std::string[sz + 1];
+  for (size_t i = 0, j = 0; i < sz; i++) {
+    if (i == position) {
+      newData[i] = item;
+    } else {
+      newData[i] = data[j++];
+    }
+  }
+  // delete data, replace with newData
+  delete[] data;
+  data = newData;
+  sz += 1;
+}
 
 /**
  * Return the first element in the sequence.
@@ -144,7 +165,7 @@ void Sequence::insert(size_t position, std::string item) {}
  * @return returns the element at the front of the sequence. Returns "" if sequence is empty.
  */
 std::string Sequence::front() const {
-  //try to return data[0] (the front) + catch the out_of_range error if sequence is emtpy
+  // try to return data[0] (the front) + catch the out_of_range error if sequence is emtpy
   try {
     return data[0];
   } catch (const std::out_of_range& e) {
@@ -177,15 +198,16 @@ size_t Sequence::size() const {
   return sz;
 }
 
-// All items in the sequence are deleted and the memory associated with the
-// sequence is released, resetting the sequence to an empty state that can have
-// items re-inserted.
+/**
+ * All items in the sequence are deleted and the memory associated with the
+ * sequence is released, resetting the sequence to an empty state that can have
+ * items re-inserted.
+ */
 void Sequence::clear() {
-
+  std::string* newData = nullptr;
+  delete[] data;
+  data = newData;
 }
-
-// The item at position is removed from the sequence, and the memory
-// is released. If called with an invalid position throws an exception.
 
 /**
  * The item at position is removed from the sequence, and the memory
@@ -211,10 +233,6 @@ void Sequence::erase(size_t position) {
   data = newData;
 }
 
-
-// The items in the sequence at ( position ... (position + count - 1) ) are
-// deleted and their memory released. If called with invalid position and/or
-// count throws an exception.
 /**
  * The items in the sequence at ( position ... (position + count - 1) ) are
  * deleted and their memory released. If called with invalid position and/or
