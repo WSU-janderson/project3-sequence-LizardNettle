@@ -219,12 +219,21 @@ void Sequence::erase(size_t position) {
   if (position >= sz) {
     throw out_of_range("Index out of range in Sequence::erase");
   }
+
+  // if only one element, clear sequence
+  if (sz == 1) {
+    delete[] data;
+    data = nullptr;
+    sz = 0;
+    return;
+  }
+
   std::string* newData = nullptr; // var will replace data
+  newData = new std::string[sz - 1];
 
   // for all items in sequence, if item is not at position, add it to newData
-  if (sz > 1) {
-    newData = new std::string[sz - 1];
-    for (size_t i = 0, j = 0; i < sz; i++) {
+  for (size_t i = 0, j = 0; i < sz; i++) {
+    if (i != position) {
       newData[j++] = data[i];
     }
   }
