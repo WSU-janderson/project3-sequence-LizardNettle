@@ -3,6 +3,8 @@
 #include <iostream>
 #include "Sequence.h"
 #include <string>
+#include <algorithm>
+#include <stdexcept>
 
 using namespace std;
 
@@ -10,27 +12,18 @@ using namespace std;
 * Creates an empty sequence (numElts == 0) or a sequence of numElts items
 * indexed from 0 ... (numElts - 1).
 */
-Sequence::Sequence(size_t sz)
-{
-  this->sz = sz;
-  if (sz == 0) {
-    data = nullptr;
-  } else {
-    data = new std::string[sz];
-  }
+Sequence::Sequence(size_t sz) : head(nullptr), tail(nullptr), sz(0) {
+    for (size_t i = 0; i < sz; ++i)
+        push_back(""); // initialize empty nodes
 }
 
 // creates a (deep) copy of sequence s
-Sequence::Sequence(const Sequence& s) {
-  sz = s.sz;
-  if (sz == 0) {
-    data = nullptr;
-  } else {
-    data = new std::string[sz];
-    for (size_t i = 0; i < sz; i++) {
-      data[i] = s.data[i];
+Sequence::Sequence(const Sequence& s) : head(nullptr), tail(nullptr), sz(0) {
+    auto current = s.head;
+    while (current) {
+        push_back(current->item);
+        current = current->next;
     }
-  }
 }
 
 /**
@@ -38,8 +31,7 @@ Sequence::Sequence(const Sequence& s) {
  * the memory associated with the sequence
  */
 Sequence::~Sequence() {
-  delete[] data;
-  data = nullptr;
+  clear ();
 }
 
 /**
@@ -50,21 +42,21 @@ Sequence::~Sequence() {
  * @return a reference to the copied sequence (
  */
 Sequence& Sequence::operator=(const Sequence& s) {
-  if (this != &s) { // prevent self assignment
-    // delete values in data, change sz to match s.sz
-    delete[] data;
-    sz = s.sz;
-
-    if (sz == 0) { // check if s is empty
-      data = nullptr;
-    } else { // copy values in s to the sequence
-      data = new std::string[sz];
-      for (size_t i = 0; i < sz; i++) {
-        data[i] = s.data[i];
-      }
-    }
-  }
-  return *this;
+  // if (this != &s) { // prevent self assignment
+  //   // delete values in data, change sz to match s.sz
+  //   delete[] data;
+  //   sz = s.sz;
+  //
+  //   if (sz == 0) { // check if s is empty
+  //     data = nullptr;
+  //   } else { // copy values in s to the sequence
+  //     data = new std::string[sz];
+  //     for (size_t i = 0; i < sz; i++) {
+  //       data[i] = s.data[i];
+  //     }
+  //   }
+  // }
+  // return *this;
 }
 
 /**
@@ -85,21 +77,34 @@ std::string& Sequence::operator[](size_t position) {
 }
 
 /**
- * The value of item is appended to the sequence.
+ *
  * @param item the string being appended to the sequence
  */
 void Sequence::push_back(std::string item) {
-  // create variable to replace data, then add all values to newData
-  std::string* newData = new std::string[sz + 1];
-  for (size_t i = 0; i < sz; i++) {
-    newData[i] = data[i];
+  auto newNode = std::make_shared<SequenceNode>(item);
+
+  // if not head, newNode is head and tail
+  // otherwise, newNode is new tail
+  if (!head) {
+    head = tail = newNode;
+  } else {
+    newNode->prev = tail;
+    tail->next = newNode;
+    tail = newNode;
   }
-  // add item to newData, then replace data with newData
-  newData[sz] = item;
-  delete[] data;
-  data = newData;
-  sz += 1;
+  ++sz;
 }
+//   // create variable to replace data, then add all values to newData
+//   std::string* newData = new std::string[sz + 1];
+//   for (size_t i = 0; i < sz; i++) {
+//     newData[i] = data[i];
+//   }
+//   // add item to newData, then replace data with newData
+//   newData[sz] = item;
+//   delete[] data;
+//   data = newData;
+//   sz += 1;
+// }
 
 
 /**
@@ -107,25 +112,38 @@ void Sequence::push_back(std::string item) {
  * If the sequence was empty, throws an exception.
  */
 void Sequence::pop_back() {
-  // if sequence sz is 0, throw underflow_error
-  if (sz == 0) {
-    throw underflow_error("Can't pop_back from empty sequence");
+  if (!tail) {
+    throw out_of_range("Index out of range in Sequence::pop_back");
   }
 
-  // reduce sz, then create a nullptr to store new data
-  sz = sz - 1;
-  std::string* newData = nullptr;
-
-  // if sz > 0 then copy all data to newData, except for the last value
-  if (sz > 0) {
-    newData = new std::string[sz];
-    for (size_t i = 0; i < sz; i++) {
-      newData[i] = data[i];
-    }
+  // reset head and tail if they're the same, otherwise, prev is tail.
+  if (head == tail) {
+    head.reset();
+    tail.reset();
+  } else {
+    tail = tail->prev.lock();
+    tail->next.reset();
   }
-  // delete data and replace it with newData
-  delete[] data;
-  data = newData;
+  sz -= 1; //decrement sz
+  // // if sequence sz is 0, throw underflow_error
+  // if (sz == 0) {
+  //   throw underflow_error("Can't pop_back from empty sequence");
+  // }
+  //
+  // // reduce sz, then create a nullptr to store new data
+  // sz = sz - 1;
+  // std::string* newData = nullptr;
+  //
+  // // if sz > 0 then copy all data to newData, except for the last value
+  // if (sz > 0) {
+  //   newData = new std::string[sz];
+  //   for (size_t i = 0; i < sz; i++) {
+  //     newData[i] = data[i];
+  //   }
+  // }
+  // // delete data and replace it with newData
+  // delete[] data;
+  // data = newData;
 }
 
 
