@@ -163,13 +163,10 @@ void Sequence::insert(size_t position, std::string item) {
  * @return returns the element at the front of the sequence. Returns "" if sequence is empty.
  */
 std::string Sequence::front() const {
-  // try to return data[0] (the front) + catch the out_of_range error if sequence is emtpy
-  try {
-    return data[0];
-  } catch (const std::out_of_range& e) {
-      std::cout << "Sequence is empty" << endl;
-      return "";
-  }
+  // if there's no head, throw error, otherwise return head
+  if (!head) {
+    throw out_of_range("Index out of range in Sequence::front");}
+  return head->item;
 }
 
 /**
@@ -178,12 +175,10 @@ std::string Sequence::front() const {
  * @return returns the element at the back of the sequence or "" if the sequence is empty.
  */
 std::string Sequence::back() const {
-  try {
-    return data[sz - 1];
-  } catch (const std::out_of_range& e) {
-    std::cout << "Sequence is empty" << endl;
-  }
-  return data[sz - 1];
+  // if there's no tail, throw error, otherwise return tail
+  if (!tail) {
+    throw out_of_range("Index out of range in Sequence::back");}
+  return tail->item;
 }
 
 // Return true if the sequence has no elements, otherwise false.
