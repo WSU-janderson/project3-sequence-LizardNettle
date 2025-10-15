@@ -42,21 +42,16 @@ Sequence::~Sequence() {
  * @return a reference to the copied sequence (
  */
 Sequence& Sequence::operator=(const Sequence& s) {
-  // if (this != &s) { // prevent self assignment
-  //   // delete values in data, change sz to match s.sz
-  //   delete[] data;
-  //   sz = s.sz;
-  //
-  //   if (sz == 0) { // check if s is empty
-  //     data = nullptr;
-  //   } else { // copy values in s to the sequence
-  //     data = new std::string[sz];
-  //     for (size_t i = 0; i < sz; i++) {
-  //       data[i] = s.data[i];
-  //     }
-  //   }
-  // }
-  // return *this;
+  if (this != &s) { // prevent self assignment
+    // clear data, then begin adding items from s iteratively while there is still a next item
+    clear();
+    auto current = s.head;
+    while (current) {
+      push_back(current->item);
+      current = current->next;
+    }
+  }
+  return *this;
 }
 
 /**
@@ -94,18 +89,6 @@ void Sequence::push_back(std::string item) {
   }
   ++sz;
 }
-//   // create variable to replace data, then add all values to newData
-//   std::string* newData = new std::string[sz + 1];
-//   for (size_t i = 0; i < sz; i++) {
-//     newData[i] = data[i];
-//   }
-//   // add item to newData, then replace data with newData
-//   newData[sz] = item;
-//   delete[] data;
-//   data = newData;
-//   sz += 1;
-// }
-
 
 /**
  * The item at the end of the sequence is deleted and size of the sequence is reudced by one.
@@ -125,25 +108,6 @@ void Sequence::pop_back() {
     tail->next.reset();
   }
   sz -= 1; //decrement sz
-  // // if sequence sz is 0, throw underflow_error
-  // if (sz == 0) {
-  //   throw underflow_error("Can't pop_back from empty sequence");
-  // }
-  //
-  // // reduce sz, then create a nullptr to store new data
-  // sz = sz - 1;
-  // std::string* newData = nullptr;
-  //
-  // // if sz > 0 then copy all data to newData, except for the last value
-  // if (sz > 0) {
-  //   newData = new std::string[sz];
-  //   for (size_t i = 0; i < sz; i++) {
-  //     newData[i] = data[i];
-  //   }
-  // }
-  // // delete data and replace it with newData
-  // delete[] data;
-  // data = newData;
 }
 
 
