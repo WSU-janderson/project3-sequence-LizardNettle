@@ -197,9 +197,9 @@ size_t Sequence::size() const {
  * items re-inserted.
  */
 void Sequence::clear() {
-  std::string* newData = nullptr;
-  delete[] data;
-  data = newData;
+  head.reset();
+  tail.reset();
+  sz = 0;
 }
 
 /**
