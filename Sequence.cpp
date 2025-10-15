@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include "Sequence.h"
+#include "SequenceNode.h"
 #include <string>
 #include <algorithm>
 #include <stdexcept>
@@ -55,6 +56,23 @@ Sequence& Sequence::operator=(const Sequence& s) {
 }
 
 /**
+ * returns a pointer to a SequenceNode at a given position in the sequence.
+ *
+ * @param position position of the node being returned
+ * @return a pointer to a SequenceNode
+ */
+std::shared_ptr<Sequence::SequenceNode> Sequence::getNodeAt(size_t position) const {
+  if (position >= sz) {
+    throw std::out_of_range("Index out of range in Sequence::getNodeAt");}
+
+  // current = head, then iterate through until you find the node at size_t position
+  auto current = head;
+  for (size_t i = 0; i < position; ++i)
+    current = current->next;
+  return current;
+}
+
+/**
  * The position satisfies ( position >= 0 && position <= last_index() ).
  * The return value is a reference to the item at index position in the
  * sequence. Throws an exception if the position is outside the bounds
@@ -66,8 +84,8 @@ Sequence& Sequence::operator=(const Sequence& s) {
 std::string& Sequence::operator[](size_t position) {
   // if position is outside the bounds of the sequence, throw out_of_range error.
   if (position >= sz) {
-    throw out_of_range("Index out of range in Sequence::operator[]");
-  }
+    throw out_of_range("Index out of range in Sequence::operator[]");}
+
   return data[position];
 }
 
@@ -78,8 +96,7 @@ std::string& Sequence::operator[](size_t position) {
 void Sequence::push_back(std::string item) {
   auto newNode = std::make_shared<SequenceNode>(item);
 
-  // if not head, newNode is head and tail
-  // otherwise, newNode is new tail
+  // if not head, newNode is head and tail, otherwise, newNode is new tail
   if (!head) {
     head = tail = newNode;
   } else {
@@ -96,8 +113,7 @@ void Sequence::push_back(std::string item) {
  */
 void Sequence::pop_back() {
   if (!tail) {
-    throw out_of_range("Index out of range in Sequence::pop_back");
-  }
+    throw out_of_range("Index out of range in Sequence::pop_back");}
 
   // reset head and tail if they're the same, otherwise, prev is tail.
   if (head == tail) {
