@@ -208,33 +208,33 @@ void Sequence::clear() {
  * @param position the position of the value being erased
  */
 void Sequence::erase(size_t position) {
-  // throw error if position is out of range
   if (position >= sz) {
-    throw out_of_range("Index out of range in Sequence::erase");
-  }
+    throw out_of_range("Index out of range in Sequence::erase");}
 
-  // if only one element, clear sequence
+  //get node, then if sz == 1, clear and return
+  auto node = getNodeAt(position);
   if (sz == 1) {
-    delete[] data;
-    data = nullptr;
-    sz = 0;
+    clear();
     return;
   }
 
-  std::string* newData = nullptr; // var will replace data
-  newData = new std::string[sz - 1];
-
-  // for all items in sequence, if item is not at position, add it to newData
-  for (size_t i = 0, j = 0; i < sz; i++) {
-    if (i != position) {
-      newData[j++] = data[i];
-    }
+  // get previous node and next node, and link them together, removing current.
+  // (making the next of prev = next, and the prev node of next = prev)
+  auto prevNode = node->prev.lock();
+  auto nextNode = node->next;
+  if (prevNode) {
+    prevNode->next = nextNode;
+  } else {
+    head = nextNode;
   }
-  // replace data with newData
-  delete[] data;
-  data = newData;
+  if (nextNode) {
+    nextNode->prev = prevNode;
+  } else {
+    tail = prevNode;
+  }
   sz -= 1;
 }
+
 
 /**
  * The items in the sequence at ( position ... (position + count - 1) ) are
