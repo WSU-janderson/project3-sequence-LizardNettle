@@ -82,11 +82,7 @@ std::shared_ptr<Sequence::SequenceNode> Sequence::getNodeAt(size_t position) con
  * @return a reference to the item at index position in the sequence.
  */
 std::string& Sequence::operator[](size_t position) {
-  // if position is outside the bounds of the sequence, throw out_of_range error.
-  if (position >= sz) {
-    throw out_of_range("Index out of range in Sequence::operator[]");}
-
-  return data[position];
+  return getNodeAt(position)->item;
 }
 
 /**
@@ -137,24 +133,35 @@ void Sequence::pop_back() {
  * @param item The item being inserted into the sequence
  */
 void Sequence::insert(size_t position, std::string item) {
-  // throw error if position is not in the Sequence
-  if (position > sz) {
-    throw out_of_range("Index out of range in Sequence::insert");
+  if (position > sz)
+    throw std::out_of_range("Index out of range in Sequence::insert");
+
+  // if position == sz, just push back and return
+  if (position == sz) {
+    push_back(item);
+    return;
+  }
+  auto newNode = std::make_shared<SequenceNode>(item);
+
+  // if position == 0, make new item head
+  if (position == 0) {
+    newNode->next = head;
+    head->prev = newNode;
+    head = newNode;
+    ++sz;
+    return;
   }
 
-  // create variable to replace data, then add all values to newData
-  std::string* newData = new std::string[sz + 1];
-  for (size_t i = 0, j = 0; i < sz + 1; i++) {
-    if (i == position) {
-      newData[i] = item;
-    } else {
-      newData[i] = data[j++];
-    }
-  }
-  // delete data, replace with newData
-  delete[] data;
-  data = newData;
-  sz += 1;
+  auto curr = getNodeAt(position);
+  auto prevNode = curr->prev.lock();
+
+  // update nodes
+  newNode->next = curr;
+  newNode->prev = prevNode;
+  prevNode->next = newNode;
+  curr->prev = newNode;
+
+  ++sz;
 }
 
 /**
