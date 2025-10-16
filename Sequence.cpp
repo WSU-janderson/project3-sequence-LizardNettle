@@ -86,6 +86,7 @@ std::string& Sequence::operator[](size_t position) {
 }
 
 /**
+ * The value of item is appended to the sequence
  *
  * @param item the string being appended to the sequence
  */
@@ -106,6 +107,8 @@ void Sequence::push_back(std::string item) {
 /**
  * The item at the end of the sequence is deleted and size of the sequence is reudced by one.
  * If the sequence was empty, throws an exception.
+ *
+ * @exception throws out_of_range exception if sequence is empty
  */
 void Sequence::pop_back() {
   if (!tail) {
@@ -129,6 +132,7 @@ void Sequence::pop_back() {
  * by one. Throws an exception if the position is outside the bounds of the
  * sequence
  *
+ * @exception out_of_range throws out_of_range exception if size_t position is larger than the sequence.
  * @param position the position the item is being inserted into.
  * @param item The item being inserted into the sequence
  */
@@ -167,10 +171,11 @@ void Sequence::insert(size_t position, std::string item) {
 /**
  * Return the first element in the sequence.
  * If the sequence is empty, prints "Sequence is emtpy" to the console.
+ *
+ * @exception out_of_range throws out_of_range exception if sequence is empty
  * @return returns the element at the front of the sequence. Returns "" if sequence is empty.
  */
 std::string Sequence::front() const {
-  // if there's no head, throw error, otherwise return head
   if (!head) {
     throw out_of_range("Index out of range in Sequence::front");}
   return head->item;
@@ -178,13 +183,13 @@ std::string Sequence::front() const {
 
 /**
  * Return the last element in the sequence.
- * If the sequence is empty, prints "Sequence is emtpy" to the console.
- * @return returns the element at the back of the sequence or "" if the sequence is empty.
+ *
+ * @exception out_of_range throws out_of_range exception if sequence is empty
+ * @return returns the element at the back of the sequence.
  */
 std::string Sequence::back() const {
-  // if there's no tail, throw error, otherwise return tail
   if (!tail) {
-    throw out_of_range("Index out of range in Sequence::back");}
+    throw out_of_range("out_of_range in Sequence::back");}
   return tail->item;
 }
 
@@ -212,6 +217,7 @@ void Sequence::clear() {
 /**
  * The item at position is removed from the sequence, and the memory
  * is released. If called with an invalid position throws an exception.
+ *
  * @param position the position of the value being erased
  */
 void Sequence::erase(size_t position) {
@@ -248,31 +254,17 @@ void Sequence::erase(size_t position) {
  * deleted and their memory released. If called with invalid position and/or
  * count throws an exception.
  *
+ * Works by repeatedly calling the erase (size_t position) function
+ *
  * @param position the position of the value being erased
  * @param count the number of items being erased.
  */
 void Sequence::erase(size_t position, size_t count) {
-  // throw error if position is out of range, or if position + count is out of range
-  if (position >= sz || position + count > sz) {
-    throw out_of_range("Index out of range in Sequence::erase");
-  }
-  std::string* newData = nullptr;
-  size_t newSize = sz - count;
-
-  // for all values in sequence, if value is not within the range of
-  // ( position ... (position + count - 1), add it to newData
-  if (newSize > 0) {
-    newData = new std::string[newSize];
-    for (size_t i = 0, j = 0; i < sz; i++) {
-      if (i < position || i >= position + count) {
-        newData[j++] = data[i];
-      }
-    }
-  }
-  // replace data with newData
-  delete[] data;
-  data = newData;
-  sz = newSize;
+  // check position, if valid, call erase(position) for all values being erased.
+  if (position >= sz || position + count > sz)
+    throw std::out_of_range("Index/count out of range in Sequence::erase");
+  for (size_t i = 0; i < count; ++i)
+    erase(position);
 }
 
 /**
@@ -284,14 +276,60 @@ void Sequence::erase(size_t position, size_t count) {
 */
 std::ostream& operator<<(std::ostream& os, const Sequence& s) {
   os << "<";
+  auto current = s.head;
 
-  // loop through all values, printing them to the console.
-  for (size_t i = 0; i < s.sz; i++) {
-    os << s.data[i];
-    if (i != s.sz - 1) {  //print comma if not on last element
+  // loop through all values, print ", " after number until there is no next.
+  while (current) {
+    os << current->item;
+    if (current->next)
       os << ", ";
-    }
+    current = current->next;
   }
   os << ">";
   return os;
+}
+
+/**
+* Points the head to the node stored at the numerically smallest address,
+* the head points to the node stored at the next smallest, until the tail points
+* to the node stored in the largest address.
+* If ascending is false, the sequence will be reversed.
+* The head pointer is then returned.
+*
+* @param ascending
+* @return
+*/
+std::weak_ptr<Sequence::SequenceNode> Sequence::sortByMemoryLocation(bool ascending) {
+  if (sz <= 1) {
+    return head;}
+
+
+  std::vector<std::shared_ptr<SequenceNode>> nodes;
+  auto current = head;
+  while (current) {
+    nodes.push_back(current);
+    current = current->next;
+  }
+
+  // sort sequence
+  std::sort(nodes.begin(), nodes.end(),
+
+      [ascending](const auto& a, const auto& b) {
+          return ascending ? (a.get() < b.get()) : (a.get() > b.get());
+      });
+
+  // Rebuild node links
+  for (size_t i = 0; i < nodes.size(); ++i) {
+    nodes[i]->prev.reset();
+    nodes[i]->next.reset();
+    if (i > 0) {
+      nodes[i]->prev = nodes[i - 1];
+      nodes[i - 1]->next = nodes[i];
+    }
+  }
+
+  head = nodes.front();
+  tail = nodes.back();
+
+  return head;
 }
